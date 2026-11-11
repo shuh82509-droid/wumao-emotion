@@ -126,6 +126,12 @@
   const stampCity = document.getElementById('stampCity');
   const stampTime = document.getElementById('stampTime');
 
+  const LOCAL = location.hostname === 'localhost' || location.hostname === '127.0.0.1' || location.protocol === 'file:';
+  const CDN = 'https://cdn.jsdelivr.net/gh/shuh82509-droid/wumao-emotion@v1/img/';
+  const IMG = LOCAL
+    ? { paris: 'img/paris.jpg', tokyo: 'img/tokyo.jpg', snow: 'img/snow.jpg', aurora: 'img/aurora.jpg', stars: 'img/stars.jpg' }
+    : { paris: CDN + 'paris.jpg', tokyo: CDN + 'tokyo.jpg', snow: CDN + 'snow.jpg', aurora: CDN + 'aurora.jpg', stars: CDN + 'stars.jpg' };
+
   let W = 0, H = 0, dpr = 1;
   let scene = null, raf = 0, startAt = 0;
   let audioCtx = null, muted = false, master = null;
@@ -139,13 +145,21 @@
   }
   window.addEventListener('resize', resize);
 
+  let photoToken = 0;
   function setPhoto(src, pos) {
-    photo.style.backgroundImage = `url("${src}")`;
-    photo.style.backgroundPosition = pos || 'center';
-    photo.classList.add('on');
-    photo.classList.remove('kb');
-    void photo.offsetWidth;
-    photo.classList.add('kb');
+    const t = ++photoToken;
+    photo.classList.remove('on', 'kb');
+    const img = new Image();
+    img.onload = () => {
+      if (t !== photoToken) return;
+      photo.style.backgroundImage = `url("${src}")`;
+      photo.style.backgroundPosition = pos || 'center';
+      photo.style.transition = 'none';
+      photo.style.opacity = '1';
+      void photo.offsetWidth;
+      photo.classList.add('on', 'kb');
+    };
+    img.src = src;
   }
 
   function ensureAudio() {
@@ -196,6 +210,7 @@
     cancelAnimationFrame(raf); raf = 0;
     ctx.clearRect(0, 0, W, H);
     photo.classList.remove('on', 'kb');
+    photo.style.opacity = '0';
     document.body.dataset.scene = '';
     stamp.classList.remove('show');
   }
@@ -254,7 +269,7 @@
     }
     return {
       start() {
-        setPhoto('img/tokyo.jpg', 'center 34%');
+        setPhoto(IMG.tokyo, 'center 34%');
         document.body.dataset.scene = 'fireworks';
         last = 0; parts.length = 0; rockets.length = 0;
         window.addEventListener('pointerdown', click);
@@ -268,10 +283,10 @@
 
   /* ---------------- city postcards ---------------- */
   const CITIES = [
-    { name: '巴黎', country: '法国', tz: 'Europe/Paris', img: 'img/paris.jpg', pos: 'center 42%', line: '此刻的巴黎，铁塔刚醒。' },
-    { name: '东京', country: '日本', tz: 'Asia/Tokyo', img: 'img/tokyo.jpg', pos: 'center 38%', line: '此刻的东京，还有一万盏灯没睡。' },
-    { name: '雷克雅未克', country: '冰岛', tz: 'Atlantic/Reykjavik', img: 'img/aurora.jpg', pos: 'center 42%', line: '此刻的冰岛，极光正在头顶铺开。' },
-    { name: '银河', country: '头顶', tz: '', noTime: true, img: 'img/stars.jpg', pos: 'center 45%', line: '此刻，银河在你头顶。' },
+    { name: '巴黎', country: '法国', tz: 'Europe/Paris', img: IMG.paris, pos: 'center 42%', line: '此刻的巴黎，铁塔刚醒。' },
+    { name: '东京', country: '日本', tz: 'Asia/Tokyo', img: IMG.tokyo, pos: 'center 38%', line: '此刻的东京，还有一万盏灯没睡。' },
+    { name: '雷克雅未克', country: '冰岛', tz: 'Atlantic/Reykjavik', img: IMG.aurora, pos: 'center 42%', line: '此刻的冰岛，极光正在头顶铺开。' },
+    { name: '银河', country: '头顶', tz: '', noTime: true, img: IMG.stars, pos: 'center 45%', line: '此刻，银河在你头顶。' },
   ];
 
   function makeCity() {
@@ -319,7 +334,7 @@
     }
     return {
       start() {
-        setPhoto('img/snow.jpg', 'center 48%');
+        setPhoto(IMG.snow, 'center 48%');
         document.body.dataset.scene = 'snow';
         init(); wind();
         setHud('今年的第一场雪，替你下了。', '不用出门，也不用等天气。', '再下一场');
@@ -368,6 +383,8 @@
   }
   const sceneNames = { fireworks: '为你放一场烟花', city: '去世界某个角落', snow: '替你下一场初雪' };
   if (initialScene && sceneNames[initialScene]) {
+    const pre = initialScene === 'city' ? [IMG.paris, IMG.tokyo, IMG.aurora, IMG.stars] : initialScene === 'snow' ? [IMG.snow] : [IMG.tokyo];
+    pre.forEach((src) => { const i = new Image(); i.src = src; });
     document.getElementById('gateTitle').textContent = sceneNames[initialScene];
     document.getElementById('startGate').classList.add('show');
     document.getElementById('gateBtn').addEventListener('click', () => {
