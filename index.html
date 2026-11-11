@@ -7,10 +7,16 @@
 <style>
   *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
   html,body{height:100%;overflow:hidden;background:#07070b;color:#f5f1e8;font-family:"Microsoft YaHei","PingFang SC",sans-serif}
-  #scene{position:fixed;inset:0;width:100%;height:100%;display:block}
-  .brand{position:fixed;left:22px;top:18px;z-index:5;font-size:12px;letter-spacing:3px;color:rgba(245,241,232,.55);font-weight:700}
-  .brand b{color:#ff5a3c}
-  .landing{position:fixed;inset:0;z-index:10;display:flex;flex-direction:column;justify-content:center;padding:0 26px;background:radial-gradient(120% 80% at 50% 0%,rgba(38,28,60,.55),rgba(7,7,11,.2) 55%,rgba(7,7,11,.9));transition:opacity .6s}
+  #photo{position:fixed;inset:0;z-index:0;background-size:cover;background-position:center;background-repeat:no-repeat;opacity:0;transition:opacity .9s ease;will-change:transform}
+  #photo.on{opacity:1}
+  #photo.kb{animation:kb 26s ease-in-out infinite alternate}
+  @keyframes kb{from{transform:scale(1.02)}to{transform:scale(1.11)}}
+  #photo::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(4,4,8,.48) 0%,rgba(4,4,8,0) 32%,rgba(4,4,8,.12) 55%,rgba(4,4,8,.88) 100%)}
+  body[data-scene="fireworks"] #photo::after{background:linear-gradient(180deg,rgba(4,4,8,.58) 0%,rgba(4,4,8,.04) 34%,rgba(4,4,8,.16) 56%,rgba(4,4,8,.86) 100%)}
+  body[data-scene="snow"] #photo::after{background:linear-gradient(180deg,rgba(4,4,8,.34) 0%,rgba(4,4,8,0) 42%,rgba(4,4,8,.58) 100%)}
+  #scene{position:fixed;inset:0;z-index:1;width:100%;height:100%;display:block;pointer-events:none}
+  .brand{position:fixed;left:22px;top:18px;z-index:5;font-size:12px;letter-spacing:3px;color:rgba(245,241,232,.62);font-weight:700}
+  .landing{position:fixed;inset:0;z-index:10;display:flex;flex-direction:column;justify-content:center;padding:0 26px;background:radial-gradient(120% 80% at 50% 0%,rgba(38,28,60,.55),rgba(7,7,11,.25) 55%,rgba(7,7,11,.94));transition:opacity .6s}
   .landing.hide{opacity:0;pointer-events:none}
   .kicker{font-size:12px;letter-spacing:6px;color:#ff5a3c;font-weight:800;margin-bottom:16px}
   .landing h1{font-family:"STSong","SimSun",serif;font-size:44px;line-height:1.18;font-weight:700;letter-spacing:1px}
@@ -22,16 +28,17 @@
   .card .t{font-size:17px;font-weight:800;letter-spacing:1px}
   .card .d{margin-top:4px;font-size:11px;color:rgba(245,241,232,.5);letter-spacing:1px}
   .card .price{font-size:12px;color:#ff5a3c;font-weight:800;white-space:nowrap;margin-left:12px}
-  .demo{position:fixed;left:22px;bottom:16px;z-index:5;font-size:10px;letter-spacing:2px;color:rgba(245,241,232,.35)}
-  .hud{position:fixed;left:0;right:0;bottom:0;z-index:6;padding:22px 24px 26px;background:linear-gradient(transparent,rgba(7,7,11,.82));opacity:0;pointer-events:none;transition:opacity .6s}
+  .credits{position:fixed;right:20px;bottom:14px;z-index:5;font-size:10px;letter-spacing:1px;color:rgba(245,241,232,.32)}
+  .credits a{color:inherit;text-decoration:underline}
+  .hud{position:fixed;left:0;right:0;bottom:0;z-index:6;padding:22px 24px 26px;background:linear-gradient(transparent,rgba(7,7,11,.84));opacity:0;pointer-events:none;transition:opacity .6s}
   .hud.show{opacity:1;pointer-events:auto}
-  .hud .h{font-family:"STSong","SimSun",serif;font-size:26px;line-height:1.35;letter-spacing:1px}
-  .hud .s{margin-top:8px;font-size:12px;line-height:1.7;color:rgba(245,241,232,.55);letter-spacing:1px}
+  .hud .h{font-family:"STSong","SimSun",serif;font-size:26px;line-height:1.35;letter-spacing:1px;text-shadow:0 2px 18px rgba(0,0,0,.5)}
+  .hud .s{margin-top:8px;font-size:12px;line-height:1.7;color:rgba(245,241,232,.62);letter-spacing:1px;text-shadow:0 1px 10px rgba(0,0,0,.6)}
   .hud .row{margin-top:16px;display:flex;gap:10px;flex-wrap:wrap}
-  .btn{padding:9px 15px;border:1px solid rgba(245,241,232,.22);border-radius:99px;background:rgba(255,255,255,.05);color:#f5f1e8;font-size:12px;font-weight:700;letter-spacing:1px;cursor:pointer;transition:.2s}
+  .btn{padding:9px 15px;border:1px solid rgba(245,241,232,.24);border-radius:99px;background:rgba(255,255,255,.06);color:#f5f1e8;font-size:12px;font-weight:700;letter-spacing:1px;cursor:pointer;transition:.2s}
   .btn:hover{border-color:#ff5a3c;color:#ff5a3c}
   .btn.primary{background:#ff5a3c;border-color:#ff5a3c;color:#120b09}
-  .modal{position:fixed;inset:0;z-index:20;display:none;align-items:center;justify-content:center;padding:24px;background:rgba(4,4,8,.72);backdrop-filter:blur(6px)}
+  .modal{position:fixed;inset:0;z-index:20;display:none;align-items:center;justify-content:center;padding:24px;background:rgba(4,4,8,.74);backdrop-filter:blur(6px)}
   .modal.show{display:flex}
   .modal .box{width:100%;max-width:340px;border:1px solid rgba(245,241,232,.16);border-radius:20px;background:#111118;padding:24px}
   .modal h3{font-size:18px;letter-spacing:1px}
@@ -42,8 +49,8 @@
   .modal .actions .btn{flex:1;text-align:center}
   .toast{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:30;padding:12px 18px;border-radius:12px;background:rgba(17,17,24,.95);border:1px solid rgba(245,241,232,.18);font-size:13px;opacity:0;pointer-events:none;transition:.3s}
   .toast.show{opacity:1}
-  .stamp{position:fixed;right:22px;top:18px;z-index:5;width:64px;height:78px;border:1px solid rgba(245,241,232,.28);border-radius:4px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;opacity:0;transition:.6s;transform:rotate(4deg)}
-  .stamp.show{opacity:.9}
+  .stamp{position:fixed;right:22px;top:18px;z-index:5;width:70px;height:84px;border:1px solid rgba(245,241,232,.30);border-radius:4px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;opacity:0;transition:.6s;transform:rotate(4deg);background:rgba(7,7,11,.18);backdrop-filter:blur(4px)}
+  .stamp.show{opacity:.92}
   .stamp .city{font-size:11px;font-weight:800;letter-spacing:1px;text-align:center;line-height:1.3}
   .stamp .time{font-size:10px;color:#ff5a3c;font-weight:800}
   @media (min-width:700px){
@@ -54,8 +61,10 @@
 </style>
 </head>
 <body>
+<div id="photo"></div>
 <canvas id="scene"></canvas>
 <div class="brand">五毛情绪铺</div>
+<div class="credits">画面素材：Wikimedia Commons · <a href="credits.html" target="_blank">来源</a></div>
 <div class="stamp" id="stamp"><div class="city" id="stampCity"></div><div class="time" id="stampTime"></div></div>
 
 <div class="landing" id="landing">
@@ -100,6 +109,7 @@
 
 <script>
 (() => {
+  const photo = document.getElementById('photo');
   const canvas = document.getElementById('scene');
   const ctx = canvas.getContext('2d');
   const landing = document.getElementById('landing');
@@ -119,30 +129,23 @@
   let W = 0, H = 0, dpr = 1;
   let scene = null, raf = 0, startAt = 0;
   let audioCtx = null, muted = false, master = null;
-  let stars = [];
 
   function resize() {
     dpr = Math.min(2, window.devicePixelRatio || 1);
     W = window.innerWidth; H = window.innerHeight;
     canvas.width = Math.floor(W * dpr); canvas.height = Math.floor(H * dpr);
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    initStars();
-    if (scene) scene.resize && scene.resize();
+    if (scene && scene.resize) scene.resize();
   }
   window.addEventListener('resize', resize);
 
-  function initStars() {
-    stars = Array.from({ length: Math.min(180, Math.floor(W * H / 9000)) }, () => ({
-      x: Math.random() * W, y: Math.random() * H * 0.75, r: Math.random() * 1.3 + 0.2, p: Math.random() * Math.PI * 2,
-    }));
-  }
-
-  function drawStars(t, alpha = 1) {
-    for (const s of stars) {
-      const a = (0.25 + 0.35 * (0.5 + 0.5 * Math.sin(t * 0.001 + s.p))) * alpha;
-      ctx.fillStyle = `rgba(255,255,255,${a})`;
-      ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2); ctx.fill();
-    }
+  function setPhoto(src, pos) {
+    photo.style.backgroundImage = `url("${src}")`;
+    photo.style.backgroundPosition = pos || 'center';
+    photo.classList.add('on');
+    photo.classList.remove('kb');
+    void photo.offsetWidth;
+    photo.classList.add('kb');
   }
 
   function ensureAudio() {
@@ -171,11 +174,11 @@
   function wind() {
     if (muted) return;
     const ac = ensureAudio(), t = ac.currentTime;
-    const len = Math.floor(ac.sampleRate * 2.2), buf = ac.createBuffer(1, len, ac.sampleRate), d = buf.getChannelData(0);
+    const len = Math.floor(ac.sampleRate * 2.4), buf = ac.createBuffer(1, len, ac.sampleRate), d = buf.getChannelData(0);
     for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * 0.5;
     const src = ac.createBufferSource(), lp = ac.createBiquadFilter(), g = ac.createGain();
-    lp.type = 'lowpass'; lp.frequency.value = 520; g.gain.setValueAtTime(0.001, t);
-    g.gain.linearRampToValueAtTime(0.16, t + 0.8); g.gain.linearRampToValueAtTime(0.001, t + 2.2);
+    lp.type = 'lowpass'; lp.frequency.value = 480; g.gain.setValueAtTime(0.001, t);
+    g.gain.linearRampToValueAtTime(0.15, t + 0.9); g.gain.linearRampToValueAtTime(0.001, t + 2.4);
     src.buffer = buf; src.connect(lp).connect(g).connect(master); src.start(t);
   }
 
@@ -191,8 +194,9 @@
 
   function resetCanvas() {
     cancelAnimationFrame(raf); raf = 0;
-    ctx.globalCompositeOperation = 'source-over';
     ctx.clearRect(0, 0, W, H);
+    photo.classList.remove('on', 'kb');
+    document.body.dataset.scene = '';
     stamp.classList.remove('show');
   }
 
@@ -202,44 +206,44 @@
     raf = requestAnimationFrame(tick);
   }
 
-  /* ---------------- fireworks ---------------- */
+  /* ---------------- fireworks over Tokyo ---------------- */
   function makeFireworks() {
     const parts = [], rockets = [];
     let last = 0, hue = 0;
     const rand = (a, b) => a + Math.random() * (b - a);
-
     function shoot(tx, ty) {
       const x = tx ?? rand(W * 0.18, W * 0.82);
-      const targetY = ty ?? rand(H * 0.12, H * 0.42);
-      rockets.push({ x, y: H + 8, tx: x + rand(-30, 30), ty: targetY, vy: -rand(8.5, 11.5), hue: hue = (hue + rand(35, 95)) % 360, trail: [] });
+      const targetY = ty ?? rand(H * 0.12, H * 0.40);
+      rockets.push({ x, y: H + 8, px: x, py: H + 8, tx: x + rand(-26, 26), ty: targetY, vy: -rand(8.5, 11.5), hue: hue = (hue + rand(35, 95)) % 360 });
     }
     function explode(r) {
-      const n = Math.floor(rand(80, 150));
+      const n = Math.floor(rand(90, 160));
       for (let i = 0; i < n; i++) {
         const a = Math.random() * Math.PI * 2, sp = rand(1.2, 5.8);
-        parts.push({ x: r.tx, y: r.ty, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp, life: 1, decay: rand(0.008, 0.018), hue: r.hue + rand(-18, 18), size: rand(0.7, 2.1) });
+        parts.push({ x: r.tx, y: r.ty, px: r.tx, py: r.ty, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp, life: 1, decay: rand(0.008, 0.018), hue: r.hue + rand(-18, 18), w: rand(0.7, 1.8) });
       }
       boom();
     }
     function draw(t) {
-      ctx.globalCompositeOperation = 'source-over';
-      ctx.fillStyle = 'rgba(7,7,11,0.20)'; ctx.fillRect(0, 0, W, H);
-      drawStars(t, 0.9);
+      ctx.clearRect(0, 0, W, H);
       ctx.globalCompositeOperation = 'lighter';
       if (t - last > rand(620, 1050)) { shoot(); last = t; }
       for (let i = rockets.length - 1; i >= 0; i--) {
-        const r = rockets[i]; r.trail.push({ x: r.x, y: r.y }); if (r.trail.length > 8) r.trail.shift();
+        const r = rockets[i];
+        r.px = r.x; r.py = r.y;
         r.x += (r.tx - r.x) * 0.03; r.y += r.vy; r.vy += 0.06;
-        for (const p of r.trail) { ctx.fillStyle = `hsla(${r.hue},90%,70%,.35)`; ctx.beginPath(); ctx.arc(p.x, p.y, 1.6, 0, Math.PI * 2); ctx.fill(); }
-        ctx.fillStyle = `hsl(${r.hue},95%,78%)`; ctx.beginPath(); ctx.arc(r.x, r.y, 2.4, 0, Math.PI * 2); ctx.fill();
+        ctx.strokeStyle = `hsla(${r.hue},95%,76%,.85)`; ctx.lineWidth = 1.6; ctx.lineCap = 'round';
+        ctx.beginPath(); ctx.moveTo(r.px, r.py); ctx.lineTo(r.x, r.y); ctx.stroke();
         if (r.y <= r.ty || r.vy >= 0) { explode(r); rockets.splice(i, 1); }
       }
       for (let i = parts.length - 1; i >= 0; i--) {
         const p = parts[i];
+        p.px = p.x; p.py = p.y;
         p.vx *= 0.985; p.vy = p.vy * 0.985 + 0.055; p.x += p.vx; p.y += p.vy; p.life -= p.decay;
         if (p.life <= 0) { parts.splice(i, 1); continue; }
-        ctx.fillStyle = `hsla(${p.hue},95%,${55 + p.life * 20}%,${p.life})`;
-        ctx.beginPath(); ctx.arc(p.x, p.y, p.size * (0.6 + p.life * 0.8), 0, Math.PI * 2); ctx.fill();
+        ctx.strokeStyle = `hsla(${p.hue},95%,${58 + p.life * 18}%,${p.life})`;
+        ctx.lineWidth = p.w * (0.6 + p.life * 0.8); ctx.lineCap = 'round';
+        ctx.beginPath(); ctx.moveTo(p.px, p.py); ctx.lineTo(p.x, p.y); ctx.stroke();
       }
       ctx.globalCompositeOperation = 'source-over';
     }
@@ -250,7 +254,9 @@
     }
     return {
       start() {
-        initStars(); last = 0; parts.length = 0; rockets.length = 0;
+        setPhoto('img/tokyo.jpg', 'center 34%');
+        document.body.dataset.scene = 'fireworks';
+        last = 0; parts.length = 0; rockets.length = 0;
         window.addEventListener('pointerdown', click);
         setHud('这一场烟花，只为你放。', '点一下屏幕，会在你指尖炸开。', '再放一场');
         loop(draw);
@@ -260,145 +266,68 @@
     };
   }
 
-  /* ---------------- city ---------------- */
+  /* ---------------- city postcards ---------------- */
   const CITIES = [
-    { name: '雷克雅未克', country: '冰岛', tz: 'Atlantic/Reykjavik', sky: ['#081426', '#123a55'], accent: '#8fe3c8', land: '#050b12', line: '此刻的冰岛，风把云吹得很慢。', kind: 'aurora' },
-    { name: '东京', country: '日本', tz: 'Asia/Tokyo', sky: ['#1a0d24', '#4a1830'], accent: '#ff7a9c', land: '#0c0610', line: '此刻的东京，有人刚下班，有人刚醒来。', kind: 'city', tower: true },
-    { name: '巴黎', country: '法国', tz: 'Europe/Paris', sky: ['#0d1730', '#384a70'], accent: '#ffd27a', land: '#080b14', line: '此刻的巴黎，塞纳河把灯光揉碎了。', kind: 'city', eiffel: true },
-    { name: '伊斯坦布尔', country: '土耳其', tz: 'Europe/Istanbul', sky: ['#1c1024', '#5b2b2a'], accent: '#ffb36b', land: '#0c0709', line: '此刻的伊斯坦布尔，宣礼声刚掠过屋顶。', kind: 'domes' },
-    { name: '大理', country: '中国', tz: 'Asia/Shanghai', sky: ['#0b1b2e', '#2d5a63'], accent: '#a8e6cf', land: '#060c10', line: '此刻的大理，苍山把云放在了肩上。', kind: 'mountains' },
-    { name: '威尼斯', country: '意大利', tz: 'Europe/Rome', sky: ['#160f22', '#57324a'], accent: '#ffc48a', land: '#0a070d', line: '此刻的威尼斯，水把整座城轻轻晃着。', kind: 'water' },
-    { name: '特罗姆瑟', country: '挪威', tz: 'Europe/Oslo', sky: ['#06101f', '#12334a'], accent: '#9db8ff', land: '#04080d', line: '此刻的特罗姆瑟，极光正在头顶铺开。', kind: 'aurora2' },
-    { name: '纽约', country: '美国', tz: 'America/New_York', sky: ['#0b1020', '#2b2f52'], accent: '#ffd166', land: '#05060b', line: '此刻的纽约，有一万盏灯还醒着。', kind: 'city', nyt: true },
+    { name: '巴黎', country: '法国', tz: 'Europe/Paris', img: 'img/paris.jpg', pos: 'center 42%', line: '此刻的巴黎，铁塔刚醒。' },
+    { name: '东京', country: '日本', tz: 'Asia/Tokyo', img: 'img/tokyo.jpg', pos: 'center 38%', line: '此刻的东京，还有一万盏灯没睡。' },
+    { name: '雷克雅未克', country: '冰岛', tz: 'Atlantic/Reykjavik', img: 'img/aurora.jpg', pos: 'center 42%', line: '此刻的冰岛，极光正在头顶铺开。' },
+    { name: '银河', country: '头顶', tz: '', noTime: true, img: 'img/stars.jpg', pos: 'center 45%', line: '此刻，银河在你头顶。' },
   ];
 
   function makeCity() {
-    let city = null, phase = 0, cloud = 0;
+    let city = null;
     function pick() {
-      let next = city; while (CITIES.length > 1 && next === city) next = CITIES[Math.floor(Math.random() * CITIES.length)];
+      let next = city;
+      while (CITIES.length > 1 && next === city) next = CITIES[Math.floor(Math.random() * CITIES.length)];
       city = next;
-      const now = new Intl.DateTimeFormat('zh-CN', { timeZone: city.tz, hour: '2-digit', minute: '2-digit', hour12: false }).format(new Date());
+      setPhoto(city.img, city.pos);
+      document.body.dataset.scene = 'city';
+      const now = city.noTime
+        ? '此刻'
+        : new Intl.DateTimeFormat('zh-CN', { timeZone: city.tz, hour: '2-digit', minute: '2-digit', hour12: false }).format(new Date());
       stampCity.textContent = city.name; stampTime.textContent = now;
       stamp.classList.add('show');
       setHud(city.name + ' · ' + city.country, city.line, '换一座城');
     }
-    function skyline(baseY, color, seed) {
-      ctx.fillStyle = color; let x = -20; let r = seed;
-      const rnd = () => { r = (r * 9301 + 49297) % 233280; return r / 233280; };
-      while (x < W + 20) {
-        const w = 18 + rnd() * 52, h = 30 + rnd() * 150;
-        ctx.fillRect(x, baseY - h, w, h + 300);
-        if (rnd() > 0.45) {
-          ctx.fillStyle = 'rgba(255,220,160,.5)';
-          for (let yy = baseY - h + 12; yy < baseY - 8; yy += 18) for (let xx = x + 6; xx < x + w - 6; xx += 14) if (rnd() > 0.55) ctx.fillRect(xx, yy, 3, 5);
-          ctx.fillStyle = color;
-        }
-        x += w + 4 + rnd() * 8;
-      }
-    }
-    function auroraBands(t, col1, col2) {
-      for (let k = 0; k < 3; k++) {
-        ctx.beginPath();
-        for (let x = 0; x <= W; x += 8) {
-          const y = H * 0.18 + k * 36 + Math.sin(x * 0.006 + t * 0.0004 + k) * 42 + Math.sin(x * 0.013 - t * 0.0002) * 18;
-          x === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
-        }
-        ctx.strokeStyle = k % 2 ? col2 : col1; ctx.lineWidth = 26 - k * 5; ctx.globalAlpha = 0.16; ctx.stroke(); ctx.globalAlpha = 1;
-      }
-    }
-    function draw(t) {
-      const g = ctx.createLinearGradient(0, 0, 0, H);
-      g.addColorStop(0, city.sky[0]); g.addColorStop(1, city.sky[1]);
-      ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
-      drawStars(t, 0.55);
-      ctx.fillStyle = 'rgba(255,236,200,.9)'; ctx.beginPath(); ctx.arc(W * 0.74, H * 0.2, 26, 0, Math.PI * 2); ctx.fill();
-      ctx.fillStyle = 'rgba(255,236,200,.12)'; ctx.beginPath(); ctx.arc(W * 0.74, H * 0.2, 60, 0, Math.PI * 2); ctx.fill();
-      cloud += 0.12;
-      for (let i = 0; i < 3; i++) {
-        ctx.fillStyle = 'rgba(255,255,255,.035)';
-        const cx = ((cloud + i * 220) % (W + 360)) - 180;
-        ctx.beginPath(); ctx.ellipse(cx, H * 0.28 + i * 26, 150, 26, 0, 0, Math.PI * 2); ctx.fill();
-      }
-      const baseY = H * 0.72;
-      if (city.kind === 'aurora' || city.kind === 'aurora2') auroraBands(t, city.accent, '#b79cff');
-      if (city.kind === 'aurora' || city.kind === 'aurora2' || city.kind === 'mountains') {
-        ctx.fillStyle = city.land;
-        ctx.beginPath(); ctx.moveTo(0, baseY);
-        for (let x = 0; x <= W; x += 20) ctx.lineTo(x, baseY - 70 - Math.sin(x * 0.008 + 1) * 90 - Math.sin(x * 0.021) * 30);
-        ctx.lineTo(W, H); ctx.lineTo(0, H); ctx.fill();
-        ctx.fillStyle = 'rgba(255,255,255,.10)';
-        ctx.beginPath(); ctx.moveTo(0, baseY - 20); for (let x = 0; x <= W; x += 24) ctx.lineTo(x, baseY - 70 - Math.sin(x * 0.008 + 1) * 88); ctx.lineTo(W, H); ctx.lineTo(0, H); ctx.fill();
-      } else if (city.kind === 'domes') {
-        ctx.fillStyle = city.land; ctx.fillRect(0, baseY, W, H - baseY);
-        for (let i = 0; i < 4; i++) {
-          const x = W * (0.12 + i * 0.24), r = 48 + (i % 2) * 22;
-          ctx.beginPath(); ctx.arc(x, baseY, r, Math.PI, 0); ctx.fill();
-          ctx.fillRect(x - 5, baseY - r - 55, 10, 55);
-          ctx.beginPath(); ctx.arc(x, baseY - r - 62, 7, 0, Math.PI * 2); ctx.fill();
-        }
-      } else if (city.kind === 'water') {
-        skyline(baseY - 30, city.land, 7);
-        ctx.fillStyle = 'rgba(10,10,20,.45)'; ctx.fillRect(0, baseY + 100, W, H - baseY - 100);
-        for (let i = 0; i < 30; i++) {
-          ctx.fillStyle = `rgba(255,200,140,${0.05 + Math.random() * 0.08})`;
-          ctx.fillRect(Math.random() * W, baseY + 110 + Math.random() * (H - baseY - 130), 30 + Math.random() * 80, 2);
-        }
-      } else {
-        skyline(baseY, city.land, city.tower ? 11 : city.eiffel ? 23 : 31);
-        if (city.eiffel) {
-          ctx.strokeStyle = city.land; ctx.lineWidth = 6;
-          ctx.beginPath(); ctx.moveTo(W * 0.5, baseY - 230); ctx.lineTo(W * 0.45, baseY); ctx.moveTo(W * 0.5, baseY - 230); ctx.lineTo(W * 0.55, baseY); ctx.stroke();
-          ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(W * 0.47, baseY - 120); ctx.lineTo(W * 0.53, baseY - 120); ctx.moveTo(W * 0.48, baseY - 70); ctx.lineTo(W * 0.52, baseY - 70); ctx.stroke();
-        }
-        if (city.tower) {
-          ctx.fillStyle = '#ff4d4d'; ctx.fillRect(W * 0.62, baseY - 200, 10, 200);
-          ctx.fillStyle = 'rgba(255,77,77,.25)'; ctx.beginPath(); ctx.arc(W * 0.625, baseY - 200, 18, 0, Math.PI * 2); ctx.fill();
-        }
-        if (city.nyt) {
-          ctx.fillStyle = city.land; ctx.fillRect(W * 0.31, baseY - 240, 26, 240);
-          ctx.beginPath(); ctx.moveTo(W * 0.31, baseY - 240); ctx.lineTo(W * 0.323, baseY - 280); ctx.lineTo(W * 0.336, baseY - 240); ctx.fill();
-        }
-      }
-      const v = ctx.createLinearGradient(0, H * 0.72, 0, H);
-      v.addColorStop(0, 'rgba(7,7,11,0)'); v.addColorStop(1, 'rgba(7,7,11,.85)');
-      ctx.fillStyle = v; ctx.fillRect(0, H * 0.7, W, H * 0.3);
-    }
     return {
-      start() { pick(); wind(); loop(draw); },
+      start() { pick(); wind(); },
       stop() {},
       resize() {},
       again() { pick(); },
     };
   }
 
-  /* ---------------- snow ---------------- */
+  /* ---------------- first snow ---------------- */
   function makeSnow() {
     const flakes = [];
-    function init() { flakes.length = 0; const n = Math.floor(W * H / 9000); for (let i = 0; i < n; i++) flakes.push({ x: Math.random() * W, y: Math.random() * H, r: Math.random() * 2.2 + 0.5, vy: Math.random() * 0.6 + 0.25, vx: Math.random() * 0.3 - 0.15, p: Math.random() * Math.PI * 2 }); }
+    function init() {
+      flakes.length = 0;
+      const n = Math.floor(W * H / 8500);
+      for (let i = 0; i < n; i++) flakes.push({ x: Math.random() * W, y: Math.random() * H, r: Math.random() * 2.4 + 0.6, vy: Math.random() * 0.7 + 0.3, vx: Math.random() * 0.3 - 0.15, p: Math.random() * Math.PI * 2 });
+    }
     function draw(t) {
-      const g = ctx.createLinearGradient(0, 0, 0, H); g.addColorStop(0, '#0a1220'); g.addColorStop(1, '#1a2436');
-      ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
-      drawStars(t, 0.25);
-      const wx = W * 0.5, wy = H * 0.52, ww = Math.min(W * 0.62, 360), wh = ww * 0.52;
-      const glow = ctx.createRadialGradient(wx, wy, 10, wx, wy, ww * 0.9);
-      glow.addColorStop(0, 'rgba(255,176,92,.30)'); glow.addColorStop(1, 'rgba(255,176,92,0)');
-      ctx.fillStyle = glow; ctx.beginPath(); ctx.arc(wx, wy, ww * 0.9, 0, Math.PI * 2); ctx.fill();
-      ctx.fillStyle = '#1b120c'; ctx.fillRect(wx - ww / 2 - 14, wy - wh / 2 - 14, ww + 28, wh + 28);
-      const wg = ctx.createLinearGradient(wx, wy - wh / 2, wx, wy + wh / 2); wg.addColorStop(0, '#ffcf8a'); wg.addColorStop(1, '#ff7a3c');
-      ctx.fillStyle = wg; ctx.fillRect(wx - ww / 2, wy - wh / 2, ww, wh);
-      ctx.strokeStyle = '#1b120c'; ctx.lineWidth = 10;
-      ctx.beginPath(); ctx.moveTo(wx, wy - wh / 2); ctx.lineTo(wx, wy + wh / 2); ctx.moveTo(wx - ww / 2, wy); ctx.lineTo(wx + ww / 2, wy); ctx.stroke();
+      ctx.clearRect(0, 0, W, H);
+      ctx.globalCompositeOperation = 'lighter';
       for (const f of flakes) {
-        f.p += 0.01; f.x += f.vx + Math.sin(f.p) * 0.25; f.y += f.vy;
+        f.p += 0.01; f.x += f.vx + Math.sin(f.p) * 0.3; f.y += f.vy;
         if (f.y > H + 4) { f.y = -4; f.x = Math.random() * W; }
         if (f.x > W + 4) f.x = -4; if (f.x < -4) f.x = W + 4;
         ctx.fillStyle = `rgba(255,255,255,${0.35 + f.r / 6})`;
         ctx.beginPath(); ctx.arc(f.x, f.y, f.r, 0, Math.PI * 2); ctx.fill();
       }
-      const v = ctx.createLinearGradient(0, H * 0.7, 0, H); v.addColorStop(0, 'rgba(7,7,11,0)'); v.addColorStop(1, 'rgba(7,7,11,.82)');
-      ctx.fillStyle = v; ctx.fillRect(0, H * 0.7, W, H * 0.3);
+      ctx.globalCompositeOperation = 'source-over';
     }
-    return { start() { init(); wind(); setHud('今年的第一场雪，替你下了。', '不用出门，也不用等天气。', '再下一场'); loop(draw); }, stop() {}, resize() { init(); } };
+    return {
+      start() {
+        setPhoto('img/snow.jpg', 'center 48%');
+        document.body.dataset.scene = 'snow';
+        init(); wind();
+        setHud('今年的第一场雪，替你下了。', '不用出门，也不用等天气。', '再下一场');
+        loop(draw);
+      },
+      stop() {},
+      resize() { init(); },
+    };
   }
 
   const scenes = { fireworks: makeFireworks(), city: makeCity(), snow: makeSnow() };
@@ -415,13 +344,16 @@
   function back() {
     if (scene) scene.stop();
     scene = null; resetCanvas();
-    hud.classList.remove('show'); stamp.classList.remove('show');
+    hud.classList.remove('show');
     landing.classList.remove('hide');
   }
 
   document.querySelectorAll('.card').forEach((el) => el.addEventListener('click', () => enter(el.dataset.scene)));
   backBtn.addEventListener('click', back);
-  againBtn.addEventListener('click', () => { if (scene && scene.again) scene.again(); else if (scene && scene._name === 'fireworks') { /* loop continues */ } else if (scene) { scene.stop(); resetCanvas(); scene.start(); } });
+  againBtn.addEventListener('click', () => {
+    if (scene && scene.again) scene.again();
+    else if (scene) { scene.stop(); resetCanvas(); scene.start(); }
+  });
   soundBtn.addEventListener('click', () => { muted = !muted; soundBtn.textContent = '声音：' + (muted ? '关' : '开'); if (master) master.gain.value = muted ? 0 : 0.22; });
 
   window.addEventListener('keydown', (e) => { if (e.key === 'Escape') back(); });
@@ -432,6 +364,7 @@
     document.querySelector('.brand').style.display = 'none';
     hud.style.display = 'none';
     stamp.style.display = 'none';
+    document.querySelector('.credits').style.display = 'none';
   }
   const sceneNames = { fireworks: '为你放一场烟花', city: '去世界某个角落', snow: '替你下一场初雪' };
   if (initialScene && sceneNames[initialScene]) {
@@ -447,8 +380,6 @@
   }, { once: true });
 
   resize();
-  // 演示版直接进入，不需要体验码；保留入口给正式版
-  setTimeout(() => { landing.querySelector('h1').style.opacity = 1; }, 100);
 })();
 </script>
 </body>
