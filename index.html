@@ -287,10 +287,10 @@
 
   /* ---------------- city postcards ---------------- */
   const CITIES = [
-    { name: '巴黎', country: '法国', tz: 'Europe/Paris', img: IMG.paris, pos: 'center 42%', line: '此刻的巴黎，铁塔刚醒。' },
-    { name: '东京', country: '日本', tz: 'Asia/Tokyo', img: IMG.tokyo, pos: 'center 38%', line: '此刻的东京，还有一万盏灯没睡。' },
-    { name: '雷克雅未克', country: '冰岛', tz: 'Atlantic/Reykjavik', img: IMG.aurora, pos: 'center 42%', line: '此刻的冰岛，极光正在头顶铺开。' },
-    { name: '银河', country: '头顶', tz: '', noTime: true, img: IMG.stars, pos: 'center 45%', line: '此刻，银河在你头顶。' },
+    { name: '巴黎', country: '法国', mood: '清晨', img: IMG.paris, pos: 'center 42%', line: '此刻的巴黎，铁塔刚醒。' },
+    { name: '东京', country: '日本', mood: '夜色', img: IMG.tokyo, pos: 'center 38%', line: '此刻的东京，还有一万盏灯没睡。' },
+    { name: '雷克雅未克', country: '冰岛', mood: '极光', img: IMG.aurora, pos: 'center 42%', line: '此刻的冰岛，极光正在头顶铺开。' },
+    { name: '银河', country: '头顶', mood: '此刻', img: IMG.stars, pos: 'center 45%', line: '此刻，银河在你头顶。' },
   ];
 
   function makeCity() {
@@ -301,10 +301,7 @@
       city = next;
       setPhoto(city.img, city.pos);
       document.body.dataset.scene = 'city';
-      const now = city.noTime
-        ? '此刻'
-        : new Intl.DateTimeFormat('zh-CN', { timeZone: city.tz, hour: '2-digit', minute: '2-digit', hour12: false }).format(new Date());
-      stampCity.textContent = city.name; stampTime.textContent = now;
+      stampCity.textContent = city.name; stampTime.textContent = city.mood;
       stamp.classList.add('show');
       setHud(city.name + ' · ' + city.country, city.line, '换一座城');
     }
