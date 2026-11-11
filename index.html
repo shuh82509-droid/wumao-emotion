@@ -224,12 +224,14 @@
   /* ---------------- fireworks over Tokyo ---------------- */
   function makeFireworks() {
     const parts = [], rockets = [];
-    let last = 0, hue = 0;
+    let last = 0;
+    const HUES = [10, 26, 42, 350, 338, 20];
+    const timers = [];
     const rand = (a, b) => a + Math.random() * (b - a);
     function shoot(tx, ty) {
       const x = tx ?? rand(W * 0.18, W * 0.82);
       const targetY = ty ?? rand(H * 0.12, H * 0.40);
-      rockets.push({ x, y: H + 8, px: x, py: H + 8, tx: x + rand(-26, 26), ty: targetY, vy: -rand(8.5, 11.5), hue: hue = (hue + rand(35, 95)) % 360 });
+      rockets.push({ x, y: H + 8, px: x, py: H + 8, tx: x + rand(-26, 26), ty: targetY, vy: -rand(8.5, 11.5), hue: HUES[Math.floor(Math.random() * HUES.length)] });
     }
     function explode(r) {
       const n = Math.floor(rand(90, 160));
@@ -275,8 +277,10 @@
         window.addEventListener('pointerdown', click);
         setHud('这一场烟花，只为你放。', '点一下屏幕，会在你指尖炸开。', '再放一场');
         loop(draw);
+        timers.push(setTimeout(() => { shoot(W * 0.32, H * 0.28); shoot(W * 0.68, H * 0.22); }, 500));
+        timers.push(setTimeout(() => shoot(W * 0.5, H * 0.3), 1300));
       },
-      stop() { window.removeEventListener('pointerdown', click); },
+      stop() { window.removeEventListener('pointerdown', click); timers.forEach(clearTimeout); timers.length = 0; },
       resize() {},
     };
   }
